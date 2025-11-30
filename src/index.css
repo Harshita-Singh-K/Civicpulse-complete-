@@ -3704,3 +3704,261 @@ html {
 .glass-blur { backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
 .text-gradient { background: var(--gradient-teal); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
 .backdrop-blur-dark { background-color: rgba(0, 0, 0, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+/* ============================================
+   CSR/NGO DASHBOARD ENHANCEMENTS
+   ============================================ */
+
+/* CSR-Specific Animations */
+@keyframes count-up {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-lift {
+  from {
+    transform: translateY(0);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  to {
+    transform: translateY(-4px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+  }
+}
+
+@keyframes glow-pulse-green {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(16, 185, 129, 0.5);
+  }
+}
+
+@keyframes glow-pulse-blue {
+  0%, 100% {
+    box-shadow: 0 0 10px rgba(59, 130, 246, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(59, 130, 246, 0.5);
+  }
+}
+
+@keyframes ripple-csr {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes parallax-scroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes fade-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-slide-left {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-bounce {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes progress-fill {
+  from {
+    width: 0;
+  }
+}
+
+@keyframes icon-bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+/* CSR Utility Classes */
+.animate-count-up {
+  animation: count-up 0.6s var(--easing-spring) forwards;
+}
+
+.animate-fade-slide-up {
+  animation: fade-slide-up 0.5s var(--easing-spring) forwards;
+}
+
+.animate-fade-slide-left {
+  animation: fade-slide-left 0.5s var(--easing-spring) forwards;
+}
+
+.card-lift-hover {
+  transition: transform 0.3s var(--easing), box-shadow 0.3s var(--easing);
+}
+
+.card-lift-hover:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+}
+
+.card-lift-hover:active {
+  transform: translateY(-2px);
+}
+
+.glow-green {
+  animation: glow-pulse-green 2s ease-in-out infinite;
+}
+
+.glow-blue {
+  animation: glow-pulse-blue 2s ease-in-out infinite;
+}
+
+.tap-scale {
+  transition: transform 0.2s var(--easing);
+}
+
+.tap-scale:active {
+  transform: scale(0.95);
+}
+
+.ripple-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.ripple-effect {
+  position: absolute;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.5);
+  animation: ripple-csr 0.6s ease-out;
+  pointer-events: none;
+}
+
+.parallax-image {
+  transition: transform 0.3s ease-out;
+}
+
+.progress-bar-animated {
+  animation: progress-fill 1s var(--easing-spring) forwards;
+}
+
+.icon-bounce-hover:hover {
+  animation: icon-bounce 0.5s ease-in-out;
+}
+
+.scale-bounce-tap:active {
+  animation: scale-bounce 0.3s var(--easing-bounce);
+}
+
+/* Stagger Animation Delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* CSR Glass Effects */
+.glass-csr {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.glass-csr-dark {
+  background: rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Snap Scroll for Carousels */
+.snap-x {
+  scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
+}
+
+.snap-center {
+  scroll-snap-align: center;
+}
+
+.snap-start {
+  scroll-snap-align: start;
+}
+
+/* Smooth Scroll */
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Hide Scrollbar but Keep Functionality */
+.scrollbar-hide-csr {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide-csr::-webkit-scrollbar {
+  display: none;
+}
+
+/* Additional CSR Animations */
+@keyframes bounce-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounce-in 0.6s var(--easing-spring) forwards;
+}
