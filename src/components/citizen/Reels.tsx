@@ -1,125 +1,140 @@
-import { Play, Heart, MessageCircle, Share2, Bookmark } from 'lucide-react';
+import { Play, Heart, MessageCircle, Share2, Bookmark, MoreHorizontal, ArrowLeft, Camera, Volume2, VolumeX, MapPin } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { mockReels } from './mockData';
 
 export function Reels() {
+  const [emblaRef, emblaApi] = useEmblaCarousel({ axis: 'y', loop: false, dragFree: false });
+  const [muted, setMuted] = useState(true);
+  const [likedReels, setLikedReels] = useState<string[]>([]);
+  const [activeIndex, setActiveIndex] = useState(0);
+
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setActiveIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    emblaApi.on('select', onSelect);
+    return () => {
+      emblaApi.off('select', onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  const toggleLike = (id: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (likedReels.includes(id)) {
+      setLikedReels(likedReels.filter(r => r !== id));
+    } else {
+      setLikedReels([...likedReels, id]);
+    }
+  };
+
+  const toggleMute = () => setMuted(!muted);
+
   return (
-    <div className="h-full flex flex-col bg-gradient-to-b from-purple-50 to-pink-50">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white px-4 py-6">
-        <h1 className="text-2xl mb-1">Civic Reels</h1>
-        <p className="text-purple-100 text-sm">Community awareness & success stories</p>
+    <div className="h-full bg-black relative overflow-hidden">
+      {/* Top Bar */}
+      <div className="absolute top-0 left-0 right-0 z-20 p-4 flex items-center justify-between bg-gradient-to-b from-black/60 to-transparent">
+        <button className="text-white">
+          <ArrowLeft className="w-6 h-6" />
+        </button>
+        <h1 className="text-white font-bold text-lg drop-shadow-md">Civic Reels</h1>
+        <button className="text-white">
+          <Camera className="w-6 h-6" />
+        </button>
       </div>
 
-      {/* Reels Grid */}
-      <div className="flex-1 overflow-y-auto p-4">
-        <div className="grid grid-cols-2 gap-3">
-          {mockReels.map(reel => (
-            <div
-              key={reel.id}
-              className="relative bg-white rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-all cursor-pointer group"
-            >
-              {/* Thumbnail */}
-              <div className="relative h-64 bg-slate-200">
-                <img
-                  src={reel.thumbnail}
-                  alt={reel.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                />
-                
-                {/* Play Button Overlay */}
-                <div className="absolute inset-0 bg-black/30 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                  <div className="w-12 h-12 bg-white/90 rounded-full flex items-center justify-center">
-                    <Play className="w-6 h-6 text-purple-600 ml-1" />
-                  </div>
-                </div>
+      {/* Vertical Carousel */}
+      <div className="h-full" ref={emblaRef}>
+        <div className="h-full flex flex-col touch-pan-y">
+          {mockReels.map((reel, index) => (
+            <div key={reel.id} className="flex-[0_0_100%] relative h-full w-full bg-slate-900">
+              {/* Media */}
+              <img
+                src={reel.thumbnail}
+                alt={reel.title}
+                className="w-full h-full object-cover opacity-90"
+              />
 
-                {/* Duration Badge */}
-                <div className="absolute bottom-2 right-2 px-2 py-1 bg-black/70 text-white text-xs rounded">
-                  {reel.duration}
-                </div>
+              {/* Video Overlay Gradient */}
+              <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-transparent to-black/80" />
+
+              {/* Play/Pause/Mute Overlay */}
+              <div
+                className="absolute inset-0 flex items-center justify-center z-10"
+                onClick={toggleMute}
+              >
+                {index === activeIndex && (
+                  <div className="bg-black/30 p-4 rounded-full backdrop-blur-sm animate-pulse-soft">
+                    {muted ? <VolumeX className="w-8 h-8 text-white" /> : <Volume2 className="w-8 h-8 text-white" />}
+                  </div>
+                )}
               </div>
 
-              {/* Info */}
-              <div className="p-3">
-                <h3 className="text-sm mb-2 line-clamp-2">{reel.title}</h3>
-                
-                <div className="flex items-center justify-between text-xs text-slate-500">
-                  <div className="flex items-center gap-3">
-                    <span className="flex items-center gap-1">
-                      <Play className="w-3 h-3" />
-                      {reel.views}
-                    </span>
-                    <span className="flex items-center gap-1">
-                      <Heart className="w-3 h-3" />
-                      {reel.likes}
-                    </span>
+              {/* Right Action Bar */}
+              <div className="absolute bottom-20 right-4 z-20 flex flex-col items-center gap-6">
+                <button
+                  onClick={(e) => toggleLike(reel.id, e)}
+                  className="flex flex-col items-center gap-1 group"
+                >
+                  <Heart
+                    className={`w-8 h-8 transition-all duration-200 ${likedReels.includes(reel.id) ? 'fill-red-500 text-red-500 scale-110' : 'text-white group-active:scale-90'}`}
+                  />
+                  <span className="text-white text-xs font-medium drop-shadow-md">{reel.likes + (likedReels.includes(reel.id) ? 1 : 0)}</span>
+                </button>
+
+                <button className="flex flex-col items-center gap-1 group">
+                  <MessageCircle className="w-8 h-8 text-white group-active:scale-90 transition-transform" />
+                  <span className="text-white text-xs font-medium drop-shadow-md">124</span>
+                </button>
+
+                <button className="flex flex-col items-center gap-1 group">
+                  <Share2 className="w-8 h-8 text-white group-active:scale-90 transition-transform" />
+                  <span className="text-white text-xs font-medium drop-shadow-md">Share</span>
+                </button>
+
+                <button className="flex flex-col items-center gap-1 group">
+                  <MoreHorizontal className="w-8 h-8 text-white group-active:scale-90 transition-transform" />
+                </button>
+              </div>
+
+              {/* Bottom Info */}
+              <div className="absolute bottom-0 left-0 right-0 p-4 z-20 pb-8 bg-gradient-to-t from-black/90 to-transparent">
+                <div className="flex items-center gap-2 mb-2">
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center text-xs font-bold text-white border border-white/20">
+                    CP
                   </div>
+                  <span className="text-white font-semibold text-sm drop-shadow-md">CivicPulse Official</span>
+                  <button className="px-2 py-0.5 rounded-md border border-white/30 text-white text-[10px] font-medium backdrop-blur-sm">
+                    Follow
+                  </button>
+                </div>
+
+                <h2 className="text-white text-base font-medium mb-1 drop-shadow-md line-clamp-2 pr-12">
+                  {reel.title}
+                </h2>
+
+                <div className="flex items-center gap-3 text-white/80 text-xs mb-3">
+                  <span className="flex items-center gap-1 bg-white/10 px-2 py-0.5 rounded-full backdrop-blur-md">
+                    <Play className="w-3 h-3 fill-white/80" /> {reel.views}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <MapPin className="w-3 h-3" /> Downtown
+                  </span>
+                </div>
+
+                {/* Progress Bar */}
+                <div className="w-full h-1 bg-white/20 rounded-full overflow-hidden mt-2">
+                  <div
+                    className={`h-full bg-[var(--accent-teal)] transition-all duration-1000 ease-linear ${index === activeIndex ? 'w-full' : 'w-0'}`}
+                    style={{ transitionDuration: index === activeIndex ? '15s' : '0s' }}
+                  />
                 </div>
               </div>
             </div>
           ))}
-        </div>
-
-        {/* Featured Reel Section */}
-        <div className="mt-6">
-          <h2 className="mb-3">Featured Story</h2>
-          <div className="bg-white rounded-xl overflow-hidden shadow-lg">
-            <div className="relative h-48 bg-gradient-to-r from-blue-500 to-purple-500">
-              <img
-                src="https://images.unsplash.com/photo-1559027615-cd4628902d4a?w=800&q=80"
-                alt="Featured"
-                className="w-full h-full object-cover opacity-80"
-              />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <button className="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-transform">
-                  <Play className="w-8 h-8 text-purple-600 ml-1" />
-                </button>
-              </div>
-            </div>
-            <div className="p-4">
-              <h3 className="mb-2">Community Cleanup Drive Success</h3>
-              <p className="text-sm text-slate-600 mb-3">
-                Watch how our community came together to clean up Green Valley Park. Over 200 volunteers participated!
-              </p>
-              <div className="flex items-center gap-4 text-sm text-slate-500">
-                <span className="flex items-center gap-1">
-                  <Play className="w-4 h-4" />
-                  25K views
-                </span>
-                <span className="flex items-center gap-1">
-                  <Heart className="w-4 h-4" />
-                  2.1K likes
-                </span>
-                <span className="flex items-center gap-1">
-                  <MessageCircle className="w-4 h-4" />
-                  342
-                </span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Categories */}
-        <div className="mt-6 mb-4">
-          <h2 className="mb-3">Browse by Category</h2>
-          <div className="grid grid-cols-2 gap-3">
-            <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-xl p-4 cursor-pointer hover:scale-105 transition-transform">
-              <div className="text-2xl mb-2">💡</div>
-              <div className="text-sm">Tips & Guides</div>
-            </div>
-            <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-xl p-4 cursor-pointer hover:scale-105 transition-transform">
-              <div className="text-2xl mb-2">🌱</div>
-              <div className="text-sm">Success Stories</div>
-            </div>
-            <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-4 cursor-pointer hover:scale-105 transition-transform">
-              <div className="text-2xl mb-2">📢</div>
-              <div className="text-sm">Awareness</div>
-            </div>
-            <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-xl p-4 cursor-pointer hover:scale-105 transition-transform">
-              <div className="text-2xl mb-2">🎓</div>
-              <div className="text-sm">Education</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
